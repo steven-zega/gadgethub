@@ -19,13 +19,18 @@
                     </a>
                 </div>
                 <div class="flex items-center space-x-6">
-                    <span class="text-sm text-slate-400">
+                    <a href="{{ route('cart.index') }}" class="relative p-2 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-xl transition flex items-center justify-center group" title="Keranjang Belanja">
+                        <i class="bi bi-cart3 text-xl transition-transform group-hover:scale-110"></i>
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]"></span>
+                    </a>
+
+                    <span class="text-sm text-slate-400 hidden sm:inline-block">
                         <i class="bi bi-person-circle text-blue-400 mr-1.5"></i> Halo, <strong class="text-white">{{ auth()->user()->name }}</strong>
                     </span>
                     <form action="{{ url('/logout') }}" method="POST" class="inline">
                         @csrf
                         <button type="submit" class="text-sm font-semibold text-red-400 hover:text-red-300 transition flex items-center gap-1">
-                            <i class="bi bi-box-arrow-right"></i> Logout
+                            <i class="bi bi-box-arrow-right"></i> <span class="hidden sm:inline">Logout</span>
                         </button>
                     </form>
                 </div>
@@ -34,93 +39,80 @@
     </nav>
 
     @if(!$products->isEmpty())
-    <header x-data="{ 
-                activeSlide: 0, 
-                slidesCount: {{ min($products->count(), 4) }},
-                next() { this.activeSlide = (this.activeSlide + 1) % this.slidesCount },
-                prev() { this.activeSlide = (this.activeSlide - 1 + this.slidesCount) % this.slidesCount }
-            }" 
-            x-init="setInterval(() => next(), 5000)"
-            class="relative overflow-hidden bg-[#0f172a] border-b border-white/5 h-[500px] md:h-[600px] max-w-[1600px] mx-auto sm:px-6 lg:px-8 pt-6">
-        
-        <div class="w-full h-full relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-[#131c31] to-slate-900 border border-white/10">
-            <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(37,99,235,0.15),transparent_50%)] pointer-events-none"></div>
+        <header x-data="{ 
+                    activeSlide: 0, 
+                    slidesCount: {{ min($products->count(), 4) }},
+                    next() { this.activeSlide = (this.activeSlide + 1) % this.slidesCount },
+                    prev() { this.activeSlide = (this.activeSlide - 1 + this.slidesCount) % this.slidesCount }
+                }" 
+                x-init="setInterval(() => next(), 5000)"
+                class="relative overflow-hidden bg-[#0f172a] border-b border-white/5 h-[500px] md:h-[600px] max-w-[1600px] mx-auto sm:px-6 lg:px-8 pt-6">
+            
+            <div class="w-full h-full relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-[#131c31] to-slate-900 border border-white/10">
+                <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(37,99,235,0.15),transparent_50%)] pointer-events-none"></div>
 
-            <div class="w-full h-full relative">
-                @foreach($products->take(4) as $index => $sliderProduct)
-                <div x-show="activeSlide === {{ $index }}" 
-                     x-transition:enter="transition ease-out duration-700"
-                     x-transition:enter-start="opacity-0 scale-95"
-                     x-transition:enter-end="opacity-100 scale-100"
-                     x-transition:leave="transition ease-in duration-400"
-                     x-transition:leave-start="opacity-100 scale-100"
-                     x-transition:leave-end="opacity-0 scale-95"
-                     class="w-full h-full absolute inset-0 flex flex-col md:flex-row items-center justify-between p-8 md:p-16 gap-8">
-                    
-                    <div class="flex-1 max-w-xl space-y-4 md:space-y-6 text-left relative z-10 order-2 md:order-1 pl-6 md:pl-12">
-                        <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-widest">
-                            <i class="bi bi-fire text-amber-500"></i> Hot Deal: {{ $sliderProduct->category }}
-                        </span>
-                        <h1 class="text-3xl md:text-5xl font-black tracking-tight text-white leading-tight line-clamp-2">
-                            {{ $sliderProduct->name }}
-                        </h1>
-                        <p class="text-sm md:text-base text-slate-400 line-clamp-2 md:line-clamp-3 font-normal leading-relaxed">
-                            {{ $sliderProduct->description ?? 'Upgrade produktivitas dan gaya hidup digitalmu dengan penawaran eksklusif gadget spesifikasi premium terbaru di GadgetHub.' }}
-                        </p>
-                        <div class="text-2xl md:text-3xl font-black text-cyan-400">
-                            Rp {{ number_format($sliderProduct->price, 0, ',', '.') }}
-                        </div>
-                        <div class="pt-2 flex flex-wrap gap-4">
-                            <a href="{{ route('user.products.show', $sliderProduct->id) }}" class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-sm font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-500/20 hover:opacity-90 transition transform hover:-translate-y-0.5">
-                                Lihat Detail <i class="bi bi-chevron-right text-xs"></i>
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="flex-1 w-full h-48 md:h-full flex items-center justify-center relative order-1 md:order-2">
-                        <div class="absolute w-64 h-64 md:w-96 md:h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
-                        @if($sliderProduct->image)
-                            <img src="{{ asset('storage/' . $sliderProduct->image) }}" alt="{{ $sliderProduct->name }}" class="max-h-[220px] md:max-h-[380px] w-auto object-contain drop-shadow-[0_20px_50px_rgba(37,99,235,0.3)] transform hover:scale-105 duration-500">
-                        @else
-                            <div class="text-slate-600 flex flex-col items-center gap-2">
-                                <i class="bi bi-image text-6xl"></i>
-                                <span class="text-xs uppercase tracking-widest">No Image</span>
+                <div class="w-full h-full relative">
+                    @foreach($products->take(4) as $index => $sliderProduct)
+                    <div x-show="activeSlide === {{ $index }}" 
+                        x-transition:enter="transition ease-out duration-700"
+                        x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100"
+                        x-transition:leave="transition ease-in duration-400"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        class="w-full h-full absolute inset-0 flex flex-col md:flex-row items-center justify-between p-8 md:p-16 gap-8">
+                        
+                        <div class="flex-1 max-w-xl space-y-4 md:space-y-6 text-left relative z-10 order-2 md:order-1 pl-6 md:pl-12">
+                            <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-widest">
+                                <i class="bi bi-fire text-amber-500"></i> Hot Deal: {{ $sliderProduct->category }}
+                            </span>
+                            <h1 class="text-3xl md:text-5xl font-black tracking-tight text-white leading-tight line-clamp-2">
+                                {{ $sliderProduct->name }}
+                            </h1>
+                            <p class="text-sm md:text-base text-slate-400 line-clamp-2 md:line-clamp-3 font-normal leading-relaxed">
+                                {{ $sliderProduct->description ?? 'Upgrade produktivitas dan gaya hidup digitalmu dengan penawaran eksklusif gadget spesifikasi premium terbaru di GadgetHub.' }}
+                            </p>
+                            <div class="text-2xl md:text-3xl font-black text-cyan-400">
+                                Rp {{ number_format($sliderProduct->price, 0, ',', '.') }}
                             </div>
-                        @endif
+                            <div class="pt-2 flex flex-wrap gap-4">
+                                <a href="{{ route('user.products.show', $sliderProduct->id) }}" class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-sm font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-500/20 hover:opacity-90 transition transform hover:-translate-y-0.5">
+                                    Lihat Detail <i class="bi bi-chevron-right text-xs"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 w-full h-48 md:h-full flex items-center justify-center relative order-1 md:order-2">
+                            <div class="absolute w-64 h-64 md:w-96 md:h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                            @if($sliderProduct->image)
+                                <img src="{{ asset('storage/' . $sliderProduct->image) }}" alt="{{ $sliderProduct->name }}" class="max-h-[220px] md:max-h-[380px] w-auto object-contain drop-shadow-[0_20px_50px_rgba(37,99,235,0.3)] transform hover:scale-105 duration-500">
+                            @else
+                                <div class="text-slate-600 flex flex-col items-center gap-2">
+                                    <i class="bi bi-image text-6xl"></i>
+                                    <span class="text-xs uppercase tracking-widest">No Image</span>
+                                </div>
+                            @endif
+                        </div>
                     </div>
+                    @endforeach
                 </div>
-                @endforeach
+
+                <button @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-xl bg-slate-900/50 hover:bg-blue-600 border border-white/10 text-white flex items-center justify-center backdrop-blur-md transition group z-20">
+                    <i class="bi bi-chevron-left text-lg group-hover:scale-110 transition"></i>
+                </button>
+                <button @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-xl bg-slate-900/50 hover:bg-blue-600 border border-white/10 text-white flex items-center justify-center backdrop-blur-md transition group z-20">
+                    <i class="bi bi-chevron-right text-lg group-hover:scale-110 transition"></i>
+                </button>
+
+                <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+                    <template x-for="slideIndex in slidesCount" :key="slideIndex">
+                        <button @click="activeSlide = slideIndex - 1" 
+                                class="h-1.5 rounded-full transition-all duration-300"
+                                :class="activeSlide === slideIndex - 1 ? 'w-8 bg-blue-500' : 'w-2 bg-white/20 hover:bg-white/40'"></button>
+                    </template>
+                </div>
             </div>
-
-            <button @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-xl bg-slate-900/50 hover:bg-blue-600 border border-white/10 text-white flex items-center justify-center backdrop-blur-md transition group z-20">
-                <i class="bi bi-chevron-left text-lg group-hover:scale-110 transition"></i>
-            </button>
-            <button @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 w-11 h-11 rounded-xl bg-slate-900/50 hover:bg-blue-600 border border-white/10 text-white flex items-center justify-center backdrop-blur-md transition group z-20">
-                <i class="bi bi-chevron-right text-lg group-hover:scale-110 transition"></i>
-            </button>
-
-            <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-                <template x-for="slideIndex in slidesCount" :key="slideIndex">
-                    <button @click="activeSlide = slideIndex - 1" 
-                            class="h-1.5 rounded-full transition-all duration-300"
-                            :class="activeSlide === slideIndex - 1 ? 'w-8 bg-blue-500' : 'w-2 bg-white/20 hover:bg-white/40'"></button>
-                </template>
-            </div>
-        </div>
-    </header>
-
-    @else
-    <header class="relative overflow-hidden bg-[#0f172a] border-b border-white/5 py-24 px-4">
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.12),transparent_45%)]"></div>
-        <div class="max-w-4xl mx-auto text-center relative z-10">
-            <span class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 mb-4">
-                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span> Generasi Baru Belanja Gadget
-            </span>
-            <h1 class="text-4xl md:text-6xl font-black tracking-tight mb-6 bg-gradient-to-b from-white to-slate-300 bg-clip-text text-transparent">
-                Temukan Gadget Masa Depanmu
-            </h1>
-        </div>
-    </header>
+        </header>
     @endif
 
     <main id="katalog" class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -194,9 +186,12 @@
 
                         <div class="p-4 pt-4 mt-3">
                             <div class="grid grid-cols-1 gap-2">
-                                <button type="button" class="w-full flex items-center justify-center gap-1.5 border border-white/10 text-slate-300 font-semibold py-2 px-3 rounded-xl text-xs hover:bg-white/10 hover:text-white transition">
-                                    <i class="bi bi-cart-plus"></i> + Keranjang
-                                </button>
+                                <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="w-full flex items-center justify-center gap-1.5 border border-white/10 text-slate-300 font-semibold py-2 px-3 rounded-xl text-xs hover:bg-white/10 hover:text-white transition">
+                                        <i class="bi bi-cart-plus"></i> + Keranjang
+                                    </button>
+                                </form>
                                 <button type="button" class="w-full bg-blue-600 text-white font-bold py-2 px-3 rounded-xl text-xs hover:bg-blue-700 transition shadow-md shadow-blue-600/10">
                                     Checkout
                                 </button>

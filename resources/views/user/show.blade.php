@@ -18,13 +18,18 @@
                     </a>
                 </div>
                 <div class="flex items-center space-x-6">
-                    <span class="text-sm text-slate-400">
+                    <a href="{{ route('cart.index') }}" class="relative p-2 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-xl transition flex items-center justify-center group" title="Keranjang Belanja">
+                        <i class="bi bi-cart3 text-xl transition-transform group-hover:scale-110"></i>
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]"></span>
+                    </a>
+
+                    <span class="text-sm text-slate-400 hidden sm:inline-block">
                         <i class="bi bi-person-circle text-blue-400 mr-1.5"></i> Halo, <strong class="text-white">{{ auth()->user()->name }}</strong>
                     </span>
                     <form action="{{ url('/logout') }}" method="POST" class="inline">
                         @csrf
                         <button type="submit" class="text-sm font-semibold text-red-400 hover:text-red-300 transition flex items-center gap-1">
-                            <i class="bi bi-box-arrow-right"></i> Logout
+                            <i class="bi bi-box-arrow-right"></i> <span class="hidden sm:inline">Logout</span>
                         </button>
                     </form>
                 </div>
@@ -80,7 +85,7 @@
                             @if($product->stock <= 0)
                                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20">Stok Habis</span>
                             @else
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-success bg-opacity-25 text-success border border-success border-opacity-50">{{ $product->stock }} Unit</span>
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">{{ $product->stock }} Unit</span>
                             @endif
                         </div>
                     </div>
@@ -97,11 +102,14 @@
 
                 <div class="pt-6 border-t border-white/10 mt-auto">
                     <div class="grid grid-cols-2 gap-4">
-                        <button type="button" class="w-full inline-flex items-center justify-center gap-2 border border-white/10 text-slate-200 font-bold py-4 px-6 rounded-2xl hover:bg-white/10 hover:text-white transition text-sm">
-                            <i class="bi bi-cart-plus text-base"></i> + Masuk Keranjang
-                        </button>
+                        <form action="{{ route('cart.add', $product->id) }}" method="POST" class="w-full">
+                            @csrf
+                            <button type="submit" @if($product->stock <= 0) disabled @endif class="w-full inline-flex items-center justify-center gap-2 border border-white/10 text-slate-200 font-bold py-4 px-6 rounded-2xl hover:bg-white/10 hover:text-white transition text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                <i class="bi bi-cart-plus text-base"></i> + Masuk Keranjang
+                            </button>
+                        </form>
                         
-                        <button type="button" class="w-full bg-blue-600 text-white font-bold py-4 px-6 rounded-2xl hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 text-center text-sm">
+                        <button type="button" @if($product->stock <= 0) disabled @endif class="w-full bg-blue-600 text-white font-bold py-4 px-6 rounded-2xl hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 text-center text-sm disabled:opacity-50 disabled:cursor-not-allowed">
                             Beli Sekarang
                         </button>
                     </div>

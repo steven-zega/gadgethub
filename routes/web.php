@@ -40,11 +40,16 @@ Route::get('/admin/dashboard', function () {
 Route::get('/user/dashboard', [HomeController::class, 'index'])->middleware('auth')->name('user.dashboard');
 Route::get('/user/products/{id}', [HomeController::class, 'show'])->middleware('auth')->name('user.products.show');
 
-// MODIFIKASI: Menambahkan Group Route untuk Cart (Keranjang Belanja) User
+// MODIFIKASI: Menambahkan Group Route untuk Cart & Profile User
 Route::middleware(['auth'])->group(function () {
+    // Fitur Keranjang Belanja
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add/{product}', [CartController::class, 'store'])->name('cart.add');
     Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
+
+    // Fitur Profile User & Alamat Default
+    Route::get('/user/profile', [HomeController::class, 'profile'])->name('user.profile');
+    Route::put('/user/profile/update', [HomeController::class, 'updateProfile'])->name('user.profile.update');
 });
 
 // Group Route CRUD Admin (Sudah diberi pengaman middleware auth dan admin)

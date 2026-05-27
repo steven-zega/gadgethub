@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
 {
@@ -38,5 +39,48 @@ class HomeController extends Controller
         $seller = User::where('role', 'admin')->first();
 
         return view('user.show', compact('product', 'seller'));
+    }
+
+    /**
+     * Tampilkan Halaman Profile User
+     */
+    public function profile()
+    {
+        return view('user.profile');
+    }
+
+    /**
+     * Proses Update Data Akun, Avatar, dan Alamat Default
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'address' => 'nullable|string',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        // Handle upload foto profil/avatar jika ada file baru
+        if ($request->hasFile('avatar')) {
+            // Hapus foto profile lama dari storage jika sebelumnya sudah ada
+            if ($user->avatar) {
+                Storage::delete('public/' . $user->avatar);
+            }
+            
+            // Simpan foto baru ke folder public/avatars
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $user->avatar = $path;
+        }
+
+        // Update data teks lainnya
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->address = $request->address;
+        $user->save();
+
+        return redirect()->back()->with('success', 'Profil dan alamat default Anda berhasil diperbarui!');
     }
 }

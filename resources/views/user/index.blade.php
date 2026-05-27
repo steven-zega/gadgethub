@@ -24,9 +24,11 @@
                         <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]"></span>
                     </a>
 
-                    <span class="text-sm text-slate-400 hidden sm:inline-block">
-                        <i class="bi bi-person-circle text-blue-400 mr-1.5"></i> Halo, <strong class="text-white">{{ auth()->user()->name }}</strong>
-                    </span>
+                    <a href="{{ route('user.profile') }}" class="text-sm text-slate-400 hover:text-blue-400 transition flex items-center gap-1.5 group">
+                        <i class="bi bi-person-circle text-blue-400 transition-transform group-hover:scale-110"></i> 
+                        Halo, <strong class="text-white group-hover:underline">{{ auth()->user()->name }}</strong>
+                    </a>
+                    
                     <form action="{{ url('/logout') }}" method="POST" class="inline">
                         @csrf
                         <button type="submit" class="text-sm font-semibold text-red-400 hover:text-red-300 transition flex items-center gap-1">

@@ -145,9 +145,9 @@
                             </div>
                         </div>
 
-                        <button type="button" class="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/20 transition transform hover:-translate-y-0.5 text-center text-sm flex items-center justify-center gap-2 group">
+                        <a href="{{ route('checkout.index', ['type' => 'cart']) }}" class="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-500/20 transition transform hover:-translate-y-0.5 text-center text-sm flex items-center justify-center gap-2 group">
                             Checkout <i class="bi bi-arrow-right transition-transform group-hover:translate-x-1"></i>
-                        </button>
+                        </a>
                     </div>
                 </div>
 

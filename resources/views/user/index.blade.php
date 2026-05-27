@@ -186,17 +186,23 @@
                             </div>
                         </a>
 
-                        <div class="p-4 pt-4 mt-3">
-                            <div class="grid grid-cols-1 gap-2">
-                                <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                        <div class="p-4 pt-0 mt-4">
+                            <div class="flex items-center gap-2 w-full">
+                                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="flex-1">
                                     @csrf
-                                    <button type="submit" class="w-full flex items-center justify-center gap-1.5 border border-white/10 text-slate-300 font-semibold py-2 px-3 rounded-xl text-xs hover:bg-white/10 hover:text-white transition">
-                                        <i class="bi bi-cart-plus"></i> + Keranjang
+                                    <button type="submit" @if($product->stock <= 0) disabled @endif class="w-full h-11 inline-flex items-center justify-center gap-1 bg-slate-900 border border-white/10 text-slate-300 font-bold rounded-xl text-[11px] hover:bg-slate-800 hover:text-white transition disabled:opacity-40 disabled:cursor-not-allowed">
+                                    Keranjang
                                     </button>
                                 </form>
-                                <button type="button" class="w-full bg-blue-600 text-white font-bold py-2 px-3 rounded-xl text-xs hover:bg-blue-700 transition shadow-md shadow-blue-600/10">
-                                    Checkout
-                                </button>
+                                
+                                <form action="{{ route('checkout.index') }}" method="GET" class="flex-1">
+                                    <input type="hidden" name="type" value="instant">
+                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                    <input type="hidden" name="quantity" value="1"> 
+                                    <button type="submit" @if($product->stock <= 0) disabled @endif class="w-full h-11 inline-flex items-center justify-center bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-black rounded-xl text-xs shadow-md shadow-blue-500/10 hover:opacity-90 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                                        Checkout
+                                    </button>
+                                </form>
                             </div>
                         </div>
 

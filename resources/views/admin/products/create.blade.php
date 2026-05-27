@@ -22,6 +22,9 @@
         .form-control-dark:focus { background: rgba(255,255,255,0.08) !important; border-color: #3b82f6 !important; box-shadow: 0 0 0 0.25rem rgba(59,130,246,0.25) !important; }
         .upload-zone { border: 2px dashed rgba(255,255,255,0.15); border-radius: 20px; background: rgba(255,255,255,0.02); transition: 0.3s; min-height: 300px; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
         .upload-zone:hover { border-color: #06b6d4; background: rgba(6,182,212,0.02); }
+        
+        /* Style Tambahan untuk Box Spesifikasi */
+        .spec-container { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 20px; }
     </style>
 </head>
 <body>
@@ -83,7 +86,8 @@
 
                         <div class="mb-4">
                             <label for="category" class="form-label small fw-semibold text-slate-400">Kategori Gadget</label>
-                            <select name="category" class="form-select form-control-dark @error('category') is-invalid @enderror" id="category" required>
+                            <select name="category" class="form-select form-control-dark @error('category') is-invalid @enderror" id="category" onchange="renderSpecificationFields()" required>
+                                <option value="">-- Pilih Kategori --</option>
                                 <option value="Handphone" {{ old('category') == 'Handphone' ? 'selected' : '' }}>Handphone</option>
                                 <option value="Laptop" {{ old('category') == 'Laptop' ? 'selected' : '' }}>Laptop</option>
                                 <option value="Tablet" {{ old('category') == 'Tablet' ? 'selected' : '' }}>Tablet</option>
@@ -92,8 +96,90 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="description" class="form-label small fw-semibold text-slate-400">Deskripsi Produk</label>
-                            <textarea name="description" class="form-control form-control-dark @error('description') is-invalid @enderror" id="description" rows="5" placeholder="Tuliskan spesifikasi detail seperti chipset, RAM, kapasitas baterai, dll..." required>{{ old('description') }}</textarea>
+                            <label class="form-label small fw-bold text-info"><i class="bi bi-cpu-fill"></i> Detail Spesifikasi Produk</label>
+                            <div class="spec-container">
+                                
+                                <div id="spec-empty-msg" class="text-muted text-center py-2 small">
+                                    Silakan tentukan kategori gadget terlebih dahulu.
+                                </div>
+
+                                <div id="fields-handphone" class="spec-group" style="display: none;">
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">RAM</label>
+                                            <input type="text" name="specifications[RAM]" placeholder="Contoh: 8GB / 12GB" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Storage (Internal)</label>
+                                            <input type="text" name="specifications[Storage]" placeholder="Contoh: 128GB / 256GB" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Kapasitas Baterai</label>
+                                            <input type="text" name="specifications[Battery]" placeholder="Contoh: 5000 mAh" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Kamera Belakang</label>
+                                            <input type="text" name="specifications[Camera]" placeholder="Contoh: 50 MP + 12 MP" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="small text-slate-400 mb-1">Ukuran & Tipe Layar</label>
+                                            <input type="text" name="specifications[Screen]" placeholder="Contoh: 6.7 inch AMOLED 120Hz" class="form-control form-control-dark text-sm">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="fields-laptop" class="spec-group" style="display: none;">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="small text-slate-400 mb-1">Processor / Chipset</label>
+                                            <input type="text" name="specifications[Processor]" placeholder="Contoh: Intel Core i7-13700H / Apple M3" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">RAM</label>
+                                            <input type="text" name="specifications[RAM]" placeholder="Contoh: 16GB DDR5 Dual Channel" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Storage (SSD)</label>
+                                            <input type="text" name="specifications[Storage]" placeholder="Contoh: 512GB NVMe PCIe Gen4" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Kartu Grafis (VGA)</label>
+                                            <input type="text" name="specifications[VGA]" placeholder="Contoh: NVIDIA RTX 4060 8GB" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Sistem Operasi</label>
+                                            <input type="text" name="specifications[OS]" placeholder="Contoh: Windows 11 Home" class="form-control form-control-dark text-sm">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="fields-tablet" class="spec-group" style="display: none;">
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Chipset / Otak dapur pacu</label>
+                                            <input type="text" name="specifications[Chipset]" placeholder="Contoh: Snapdragon 8 Gen 2" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">RAM & Penyimpanan</label>
+                                            <input type="text" name="specifications[RAM_Storage]" placeholder="Contoh: 8GB / 256GB" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Ukuran Layar</label>
+                                            <input type="text" name="specifications[Screen]" placeholder="Contoh: 11 inch Liquid Retina IPS" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Dukungan Stylus Pen</label>
+                                            <input type="text" name="specifications[Stylus]" placeholder="Contoh: Ya, Didukung (Include dalam box)" class="form-control form-control-dark text-sm">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="description" class="form-label small fw-semibold text-slate-400">Deskripsi Ringkas</label>
+                            <textarea name="description" class="form-control form-control-dark @error('description') is-invalid @enderror" id="description" rows="3" placeholder="Tulis deskripsi singkat kelebihan produk (Bukan spesifikasi teks)..." required>{{ old('description') }}</textarea>
                             @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
@@ -138,6 +224,46 @@
                 }
             }
         }
+
+        // FUNGSI JAVASCRIPT: Mengatur pergantian kotak input field terpisah secara real-time
+        function renderSpecificationFields() {
+            const categorySelect = document.getElementById('category');
+            const currentCategory = categorySelect.value;
+            
+            const msgPlaceholder = document.getElementById('spec-empty-msg');
+            const allGroups = document.querySelectorAll('.spec-group');
+
+            // Sembunyikan pesan petunjuk dan seluruh template input field
+            msgPlaceholder.style.display = 'none';
+            allGroups.forEach(group => {
+                group.style.display = 'none';
+                // Matikan fungsi input field tersembunyi agar datanya tidak bocor terkirim ke Laravel
+                group.querySelectorAll('input').forEach(inputField => inputField.disabled = true);
+            });
+
+            // Tampilkan input field yang sesuai dengan kategori terpilih
+            if (currentCategory === 'Handphone') {
+                const targetBox = document.getElementById('fields-handphone');
+                targetBox.style.display = 'block';
+                targetBox.querySelectorAll('input').forEach(inputField => inputField.disabled = false);
+            } else if (currentCategory === 'Laptop') {
+                const targetBox = document.getElementById('fields-laptop');
+                targetBox.style.display = 'block';
+                targetBox.querySelectorAll('input').forEach(inputField => inputField.disabled = false);
+            } else if (currentCategory === 'Tablet') {
+                const targetBox = document.getElementById('fields-tablet');
+                targetBox.style.display = 'block';
+                targetBox.querySelectorAll('input').forEach(inputField => inputField.disabled = false);
+            } else {
+                // Kembalikan ke pesan petunjuk awal jika admin batal memilih kategori
+                msgPlaceholder.style.display = 'block';
+            }
+        }
+
+        // Jalankan fungsi otomatis saat reload halaman untuk mengamankan data lama (old value)
+        document.addEventListener("DOMContentLoaded", function() {
+            renderSpecificationFields();
+        });
     </script>
 </body>
 </html>

@@ -18,7 +18,12 @@ class Product extends Model
         'description',
         'price',
         'stock',
-        'image'
+        'image',
+        'specifications'
+    ];
+
+    protected $casts = [
+        'specifications' => 'array',
     ];
 
     public function user(): BelongsTo

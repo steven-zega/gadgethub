@@ -90,13 +90,55 @@
                         </div>
                     </div>
 
-                    <div class="mb-8">
+                    <div class="mb-6">
                         <h2 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-1.5">
                             <i class="bi bi-file-text"></i> Deskripsi Produk
                         </h2>
                         <p class="text-slate-300 text-sm leading-relaxed whitespace-pre-line bg-white/[0.02] p-4 rounded-xl border border-white/5">
-                            {{ $product->description ?? 'Tidak ada deskripsi atau spesifikasi teknis lengkap untuk produk ini.' }}
+                            {{ $product->description ?? 'Tidak ada deskripsi lengkap untuk produk ini.' }}
                         </p>
+                    </div>
+
+                    <div class="mb-8">
+                        <h2 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-1.5">
+                            <i class="bi bi-cpu-fill text-cyan-400"></i> Spesifikasi Teknis {{ $product->category ?? '' }}
+                        </h2>
+                        
+                        @if(!empty($product->specifications))
+                            <div class="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden text-sm shadow-inner">
+                                @foreach($product->specifications as $key => $value)
+                                    @if(!empty($value))
+                                        <div class="grid grid-cols-3 border-b border-white/5 last:border-b-0 hover:bg-white/[0.03] transition duration-150">
+                                            <div class="col-span-1 p-3.5 font-bold text-slate-400 bg-slate-950/20 flex items-center gap-2">
+                                                @switch(strtolower($key))
+                                                    @case('ram') <i class="bi bi-memory text-blue-400"></i> @break
+                                                    @case('storage') <i class="bi bi-hdd-fill text-blue-400"></i> @break
+                                                    @case('ram_storage') <i class="bi bi-device-ssd text-blue-400"></i> @break
+                                                    @case('battery') <i class="bi bi-battery-charging text-emerald-400"></i> @break
+                                                    @case('processor') <i class="bi bi-cpu text-cyan-400"></i> @break
+                                                    @case('chipset') <i class="bi bi-cpu-fill text-cyan-400"></i> @break
+                                                    @case('vga') <i class="bi bi-pci-card text-purple-400"></i> @break
+                                                    @case('screen') <i class="bi bi-display text-amber-400"></i> @break
+                                                    @case('camera') <i class="bi bi-camera-fill text-rose-400"></i> @break
+                                                    @case('os') <i class="bi bi-windows text-sky-400"></i> @break
+                                                    @case('stylus') <i class="bi bi-pencil-fill text-indigo-400"></i> @break
+                                                    @default <i class="bi bi-arrow-right-short text-slate-500"></i>
+                                                @endswitch
+                                                <span class="capitalize">{{ str_replace('_', ' & ', $key) }}</span>
+                                            </div>
+                                            <div class="col-span-2 p-3.5 text-slate-200 font-semibold bg-white/[0.01] flex items-center">
+                                                {{ $value }}
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="text-xs text-slate-500 italic bg-white/[0.01] p-4 rounded-2xl border border-dashed border-white/10 text-center">
+                                <i class="bi bi-exclamation-circle d-block mb-1 text-base text-slate-600"></i>
+                                Detail spesifikasi belum dikonfigurasi untuk produk ini.
+                            </div>
+                        @endif
                     </div>
                 </div>
 

@@ -21,6 +21,9 @@
         .form-control-dark { background: rgba(255,255,255,0.05) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: white !important; border-radius: 14px; padding: 12px 16px; }
         .form-control-dark:focus { background: rgba(255,255,255,0.08) !important; border-color: #3b82f6 !important; box-shadow: 0 0 0 0.25rem rgba(59,130,246,0.25) !important; }
         .image-zone { border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; background: rgba(255,255,255,0.02); min-height: 300px; display: flex; align-items: center; justify-content: center; overflow: hidden; p: 15px; }
+        
+        /* Container Spesifikasi */
+        .spec-container { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 20px; padding: 20px; }
     </style>
 </head>
 <body>
@@ -88,7 +91,7 @@
 
                         <div class="mb-4">
                             <label for="category" class="form-label small fw-semibold text-slate-400">Kategori Gadget</label>
-                            <select name="category" class="form-select form-control-dark @error('category') is-invalid @enderror" id="category" required>
+                            <select name="category" class="form-select form-control-dark @error('category') is-invalid @enderror" id="category" onchange="renderSpecificationFields()" required>
                                 <option value="Handphone" {{ old('category', $product->category) == 'Handphone' ? 'selected' : '' }}>Handphone</option>
                                 <option value="Laptop" {{ old('category', $product->category) == 'Laptop' ? 'selected' : '' }}>Laptop</option>
                                 <option value="Tablet" {{ old('category', $product->category) == 'Tablet' ? 'selected' : '' }}>Tablet</option>
@@ -97,8 +100,86 @@
                         </div>
 
                         <div class="mb-4">
+                            <label class="form-label small fw-bold text-info"><i class="bi bi-cpu-fill"></i> Detail Spesifikasi Produk</label>
+                            <div class="spec-container">
+                                
+                                <div id="fields-handphone" class="spec-group" style="display: none;">
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">RAM</label>
+                                            <input type="text" name="specifications[RAM]" value="{{ $product->specifications['RAM'] ?? '' }}" placeholder="Contoh: 8GB" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Storage (Internal)</label>
+                                            <input type="text" name="specifications[Storage]" value="{{ $product->specifications['Storage'] ?? '' }}" placeholder="Contoh: 256GB" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Kapasitas Baterai</label>
+                                            <input type="text" name="specifications[Battery]" value="{{ $product->specifications['Battery'] ?? '' }}" placeholder="Contoh: 5000 mAh" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Kamera Belakang</label>
+                                            <input type="text" name="specifications[Camera]" value="{{ $product->specifications['Camera'] ?? '' }}" placeholder="Contoh: 50 MP" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="small text-slate-400 mb-1">Ukuran & Tipe Layar</label>
+                                            <input type="text" name="specifications[Screen]" value="{{ $product->specifications['Screen'] ?? '' }}" placeholder="Contoh: 6.7 inch AMOLED" class="form-control form-control-dark text-sm">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="fields-laptop" class="spec-group" style="display: none;">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="small text-slate-400 mb-1">Processor / Chipset</label>
+                                            <input type="text" name="specifications[Processor]" value="{{ $product->specifications['Processor'] ?? '' }}" placeholder="Contoh: Intel Core i7" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">RAM</label>
+                                            <input type="text" name="specifications[RAM]" value="{{ $product->specifications['RAM'] ?? '' }}" placeholder="Contoh: 16GB DDR5" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Storage (SSD)</label>
+                                            <input type="text" name="specifications[Storage]" value="{{ $product->specifications['Storage'] ?? '' }}" placeholder="Contoh: 512GB NVMe" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Kartu Grafis (VGA)</label>
+                                            <input type="text" name="specifications[VGA]" value="{{ $product->specifications['VGA'] ?? '' }}" placeholder="Contoh: NVIDIA RTX 4060" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Sistem Operasi</label>
+                                            <input type="text" name="specifications[OS]" value="{{ $product->specifications['OS'] ?? '' }}" placeholder="Contoh: Windows 11" class="form-control form-control-dark text-sm">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="fields-tablet" class="spec-group" style="display: none;">
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Chipset</label>
+                                            <input type="text" name="specifications[Chipset]" value="{{ $product->specifications['Chipset'] ?? '' }}" placeholder="Contoh: Snapdragon 8 Gen 2" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">RAM & Penyimpanan</label>
+                                            <input type="text" name="specifications[RAM_Storage]" value="{{ $product->specifications['RAM_Storage'] ?? '' }}" placeholder="Contoh: 8GB / 256GB" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Ukuran Layar</label>
+                                            <input type="text" name="specifications[Screen]" value="{{ $product->specifications['Screen'] ?? '' }}" placeholder="Contoh: 11 inch IPS" class="form-control form-control-dark text-sm">
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="small text-slate-400 mb-1">Dukungan Stylus Pen</label>
+                                            <input type="text" name="specifications[Stylus]" value="{{ $product->specifications['Stylus'] ?? '' }}" placeholder="Contoh: Ya, Didukung" class="form-control form-control-dark text-sm">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
                             <label for="description" class="form-label small fw-semibold text-slate-400">Deskripsi</label>
-                            <textarea name="description" class="form-control form-control-dark @error('description') is-invalid @enderror" id="description" rows="5" required>{{ old('description', $product->description) }}</textarea>
+                            <textarea name="description" class="form-control form-control-dark @error('description') is-invalid @enderror" id="description" rows="4" required>{{ old('description', $product->description) }}</textarea>
                             @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 
@@ -117,7 +198,7 @@
 
                         <div class="d-grid pt-2">
                             <button type="submit" class="btn-modern py-3 justify-content-center">
-                                <i class="bi bi-check-circle-fill"></i> Simpan
+                                <i class="bi bi-check-circle-fill"></i> Simpan Perubahan
                             </button>
                         </div>
                     </div>
@@ -143,6 +224,39 @@
                 }
             }
         }
+
+        // FUNGSI JAVASCRIPT: Menyesuaikan tampilan kotak form input sesuai kategori terpilih
+        function renderSpecificationFields() {
+            const categorySelect = document.getElementById('category');
+            const currentCategory = categorySelect.value;
+            const allGroups = document.querySelectorAll('.spec-group');
+
+            // Sembunyikan seluruh template dan nonaktifkan fungsinya sementara
+            allGroups.forEach(group => {
+                group.style.display = 'none';
+                group.querySelectorAll('input').forEach(inputField => inputField.disabled = true);
+            });
+
+            // Aktifkan & munculkan grup input field yang sesuai dengan kategori terpilih
+            if (currentCategory === 'Handphone') {
+                const targetBox = document.getElementById('fields-handphone');
+                targetBox.style.display = 'block';
+                targetBox.querySelectorAll('input').forEach(inputField => inputField.disabled = false);
+            } else if (currentCategory === 'Laptop') {
+                const targetBox = document.getElementById('fields-laptop');
+                targetBox.style.display = 'block';
+                targetBox.querySelectorAll('input').forEach(inputField => inputField.disabled = false);
+            } else if (currentCategory === 'Tablet') {
+                const targetBox = document.getElementById('fields-tablet');
+                targetBox.style.display = 'block';
+                targetBox.querySelectorAll('input').forEach(inputField => inputField.disabled = false);
+            }
+        }
+
+        // Jalankan fungsi otomatis saat halaman selesai dimuat agar langsung membaca kategori bawaan produk
+        document.addEventListener("DOMContentLoaded", function() {
+            renderSpecificationFields();
+        });
     </script>
 </body>
 </html>

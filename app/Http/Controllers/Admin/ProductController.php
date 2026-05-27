@@ -37,7 +37,8 @@ class ProductController extends Controller
             'price' => 'required|integer',
             'stock' => 'required|integer',
             'description' => 'nullable',
-            'image' => 'nullable|image'
+            'image' => 'nullable|image',
+            'specifications' => 'nullable|array', // <-- PERUBAHAN: Izinkan data spesifikasi berbentuk array masuk
         ]);
 
         if ($request->hasFile('image')) {
@@ -75,7 +76,8 @@ class ProductController extends Controller
             'price' => 'required|integer',
             'stock' => 'required|integer',
             'description' => 'nullable',
-            'image' => 'nullable|image'
+            'image' => 'nullable|image',
+            'specifications' => 'nullable|array', // <-- PERUBAHAN: Izinkan data spesifikasi berbentuk array masuk saat update produk
         ]);
 
         if ($request->hasFile('image')) {

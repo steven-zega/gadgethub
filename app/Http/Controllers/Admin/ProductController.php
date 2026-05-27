@@ -33,6 +33,7 @@ class ProductController extends Controller
     {
         $data = $request->validate([
             'name' => 'required',
+            'category' => 'required|in:Handphone,Laptop,Tablet',
             'price' => 'required|integer',
             'stock' => 'required|integer',
             'description' => 'nullable',
@@ -70,6 +71,7 @@ class ProductController extends Controller
 
         $data = $request->validate([
             'name' => 'required',
+            'category' => 'required|in:Handphone,Laptop,Tablet',
             'price' => 'required|integer',
             'stock' => 'required|integer',
             'description' => 'nullable',

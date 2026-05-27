@@ -51,21 +51,42 @@
     </header>
 
     <main id="katalog" class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div class="flex items-center gap-3 mb-10 border-b border-white/10 pb-5">
-            <div class="p-2 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400">
-                <i class="bi bi-cpu-fill text-xl"></i>
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 border-b border-white/10 pb-6">
+            <div class="flex items-center gap-3">
+                <div class="p-2 rounded-xl bg-blue-600/10 border border-blue-500/20 text-blue-400">
+                    <i class="bi bi-cpu-fill text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-extrabold tracking-tight text-white m-0">Katalog Gadget Terbaru</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Menampilkan deretan device spesifikasi terbaik</p>
+                </div>
             </div>
-            <div>
-                <h2 class="text-2xl font-extrabold tracking-tight text-white m-0">Katalog Gadget Terbaru</h2>
-                <p class="text-xs text-slate-400 mt-0.5">Menampilkan deretan device spesifikasi terbaik</p>
+
+            <div class="flex flex-wrap gap-2.5">
+                <a href="{{ url('/user/dashboard') }}" 
+                   class="px-5 py-2.5 rounded-xl text-xs font-bold tracking-wide uppercase transition duration-200 border {{ !request('category') ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/20' : 'bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:text-white' }}">
+                    Semua Gadget
+                </a>
+                <a href="{{ url('/user/dashboard?category=Handphone') }}" 
+                   class="px-5 py-2.5 rounded-xl text-xs font-bold tracking-wide uppercase transition duration-200 border {{ request('category') == 'Handphone' ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/20' : 'bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:text-white' }}">
+                    <i class="bi bi-phone mr-1.5 text-sm"></i> Handphone
+                </a>
+                <a href="{{ url('/user/dashboard?category=Laptop') }}" 
+                   class="px-5 py-2.5 rounded-xl text-xs font-bold tracking-wide uppercase transition duration-200 border {{ request('category') == 'Laptop' ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/20' : 'bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:text-white' }}">
+                    <i class="bi bi-laptop mr-1.5 text-sm"></i> Laptop
+                </a>
+                <a href="{{ url('/user/dashboard?category=Tablet') }}" 
+                   class="px-5 py-2.5 rounded-xl text-xs font-bold tracking-wide uppercase transition duration-200 border {{ request('category') == 'Tablet' ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-600/20' : 'bg-white/5 text-slate-400 border-white/5 hover:bg-white/10 hover:text-white' }}">
+                    <i class="bi bi-tablet mr-1.5 text-sm"></i> Tablet
+                </a>
             </div>
         </div>
 
         @if($products->isEmpty())
             <div class="text-center py-20 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm">
                 <i class="bi bi-patch-exclamation text-slate-500 text-5xl block mb-4"></i>
-                <p class="text-slate-300 text-xl font-medium">Belum ada gadget yang tersedia saat ini.</p>
-                <p class="text-slate-500 text-sm mt-2">Silakan tambahkan produk baru melalui dashboard manajemen admin.</p>
+                <p class="text-slate-300 text-xl font-medium">Belum ada gadget di kategori ini saat ini.</p>
+                <p class="text-slate-500 text-sm mt-2">Silakan ganti filter atau tambahkan produk baru melalui manajemen admin.</p>
             </div>
         @else
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
@@ -74,6 +95,10 @@
                         
                         <a href="{{ route('user.products.show', $product->id) }}" class="block flex-1">
                             <div class="w-full h-44 bg-white/5 flex items-center justify-center overflow-hidden border-b border-white/5 relative">
+                                <span class="absolute top-3 left-3 px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide uppercase bg-slate-900/80 border border-white/10 text-slate-300 backdrop-blur-sm">
+                                    {{ $product->category }}
+                                </span>
+
                                 @if($product->image)
                                     <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-full object-contain p-4 group-hover:scale-105 transition duration-300">
                                 @else

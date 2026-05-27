@@ -69,6 +69,12 @@
                             <span class="text-slate-400 flex items-center gap-1.5"><i class="bi bi-shield-check text-blue-400"></i> Seller:</span>
                             <span class="font-bold text-white">{{ $product->user->name ?? 'Admin GadgetHub' }}</span>
                         </div>
+                        
+                        <div class="flex justify-between items-center pb-2 border-b border-white/5">
+                            <span class="text-slate-400 flex items-center gap-1.5"><i class="bi bi-tag text-blue-400"></i> Kategori:</span>
+                            <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-white/10 text-cyan-400 border border-white/5">{{ $product->category ?? 'Gadget' }}</span>
+                        </div>
+
                         <div class="flex justify-between items-center">
                             <span class="text-slate-400 flex items-center gap-1.5"><i class="bi bi-boxes text-blue-400"></i> Stock:</span>
                             @if($product->stock <= 0)

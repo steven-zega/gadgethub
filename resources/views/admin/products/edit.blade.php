@@ -87,6 +87,16 @@
                         </div>
 
                         <div class="mb-4">
+                            <label for="category" class="form-label small fw-semibold text-slate-400">Kategori Gadget</label>
+                            <select name="category" class="form-select form-control-dark @error('category') is-invalid @enderror" id="category" required>
+                                <option value="Handphone" {{ old('category', $product->category) == 'Handphone' ? 'selected' : '' }}>Handphone</option>
+                                <option value="Laptop" {{ old('category', $product->category) == 'Laptop' ? 'selected' : '' }}>Laptop</option>
+                                <option value="Tablet" {{ old('category', $product->category) == 'Tablet' ? 'selected' : '' }}>Tablet</option>
+                            </select>
+                            @error('category') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                        </div>
+
+                        <div class="mb-4">
                             <label for="description" class="form-label small fw-semibold text-slate-400">Deskripsi</label>
                             <textarea name="description" class="form-control form-control-dark @error('description') is-invalid @enderror" id="description" rows="5" required>{{ old('description', $product->description) }}</textarea>
                             @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror

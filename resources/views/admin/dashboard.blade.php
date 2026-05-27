@@ -33,6 +33,9 @@
         <a href="{{ route('products.index') }}" class="nav-link">
             <i class="bi bi-box-seam-fill"></i> Produk
         </a>
+        <a href="{{ route('admin.orders.index') }}" class="nav-link">
+            <i class="bi bi-wallet2"></i> Pesanan Masuk
+        </a>
         <a href="#" class="nav-link">
             <i class="bi bi-bar-chart-line-fill"></i> Statistik
         </a>
@@ -69,13 +72,15 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card-modern">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="text-muted text-uppercase small mb-0 tracking-wider">Pesanan Masuk</h6>
-                        <i class="bi bi-cart-check text-info fs-4"></i>
+                <a href="{{ route('admin.orders.index') }}" class="text-decoration-none text-white">
+                    <div class="card-modern">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="text-muted text-uppercase small mb-0 tracking-wider">Pesanan Masuk</h6>
+                            <i class="bi bi-cart-check text-info fs-4"></i>
+                        </div>
+                        <h2 class="fw-bold display-6 m-0 text-info">18</h2>
                     </div>
-                    <h2 class="fw-bold display-6 m-0 text-info">18</h2>
-                </div>
+                </a>
             </div>
         </div>
 

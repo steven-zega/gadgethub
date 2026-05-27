@@ -33,11 +33,14 @@
         <div class="brand">
             <i class="bi bi-phone-vibrate text-primary"></i> GadgetHub Admin
         </div>
-        <a href="{{ url('/admin/dashboard') }}" class="nav-link">
+        <a href="{{ url('/admin/dashboard') }}" class="nav-link active">
             <i class="bi bi-grid-1x2-fill"></i> Dashboard
         </a>
-        <a href="{{ route('products.index') }}" class="nav-link active">
+        <a href="{{ route('products.index') }}" class="nav-link">
             <i class="bi bi-box-seam-fill"></i> Produk
+        </a>
+        <a href="{{ route('admin.orders.index') }}" class="nav-link">
+            <i class="bi bi-wallet2"></i> Pesanan Masuk
         </a>
         <a href="#" class="nav-link">
             <i class="bi bi-bar-chart-line-fill"></i> Statistik

@@ -9,7 +9,16 @@ class OrderItem extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['order_id', 'product_id', 'quantity', 'price'];
+    // 🌟 SELESAI DIUBAH: Menambahkan 'status' ke dalam $fillable agar aksi verifikasi admin tersimpan ke DB
+    protected $fillable = ['order_id', 'product_id', 'quantity', 'price', 'status'];
+
+    /**
+     * Relasi ke model Order (Menghubungkan item pesanan ke data induk Order)
+     */
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 
     public function product()
     {

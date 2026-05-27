@@ -51,48 +51,49 @@
                             </div>
                             <div class="text-slate-600 hidden sm:block">|</div>
                             <div>
-                                <span class="text-slate-500 font-medium">Tanggal:</span>
+                                <span class="text-slate-500 font-medium">Tanggal Transaksi:</span>
                                 <span class="text-slate-300 ml-1">{{ $order->created_at->format('d M Y, H:i') }}</span>
                             </div>
-                        </div>
-
-                        <div>
-                            @if($order->status === 'pending')
-                                <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-full flex items-center gap-1.5">
-                                    <span class="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse"></span> Menunggu Verifikasi
-                                </span>
-                            @elseif($order->status === 'processing')
-                                <span class="text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1 rounded-full flex items-center gap-1.5">
-                                    <span class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></span> Sedang Diproses
-                                </span>
-                            @elseif($order->status === 'completed')
-                                <span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full flex items-center gap-1.5">
-                                    <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span> Selesai
-                                </span>
-                            @else
-                                <span class="text-[10px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/20 px-3 py-1 rounded-full flex items-center gap-1.5">
-                                    <span class="w-1.5 h-1.5 bg-rose-400 rounded-full"></span> Dibatalkan
-                                </span>
-                            @endif
                         </div>
                     </div>
 
                     <div class="p-4 sm:p-6 divide-y divide-white/5">
                         @foreach($order->items as $item)
-                            <div class="flex items-center gap-4 py-4 first:pt-0 last:pb-0">
-                                <div class="w-14 h-14 bg-white/5 rounded-xl border border-white/5 p-1 flex-shrink-0 flex items-center justify-center">
-                                    @if($item->product->image)
-                                        <img src="{{ asset('storage/' . $item->product->image) }}" class="w-full h-full object-contain">
-                                    @else
-                                        <i class="bi bi-image text-slate-600 text-lg"></i>
-                                    @endif
+                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 py-4 first:pt-0 last:pb-0">
+                                <div class="flex items-center gap-4 flex-1 min-w-0">
+                                    <div class="w-14 h-14 bg-white/5 rounded-xl border border-white/5 p-1 flex-shrink-0 flex items-center justify-center">
+                                        @if($item->product && $item->product->image)
+                                            <img src="{{ asset('storage/' . $item->product->image) }}" class="w-full h-full object-contain">
+                                        @else
+                                            <i class="bi bi-image text-slate-600 text-lg"></i>
+                                        @endif
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="font-bold text-sm text-slate-200 truncate">{{ $item->product->name ?? 'Produk Terhapus' }}</h4>
+                                        <p class="text-xs text-slate-500 mt-0.5">{{ $item->quantity }} barang x Rp {{ number_format($item->price, 0, ',', '.') }}</p>
+                                    </div>
                                 </div>
-                                <div class="flex-1 min-w-0">
-                                    <h4 class="font-bold text-sm text-slate-200 truncate">{{ $item->product->name }}</h4>
-                                    <p class="text-xs text-slate-500 mt-0.5">{{ $item->quantity }} barang x Rp {{ number_format($item->price, 0, ',', '.') }}</p>
-                                </div>
-                                <div class="text-sm font-bold text-slate-300 text-right">
-                                    Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}
+
+                                <div class="flex items-center justify-between md:justify-end gap-6 border-t md:border-t-0 border-white/5 pt-2 md:pt-0">
+                                    <div class="text-xs">
+                                        @if(($item->status ?? 'pending') === 'success')
+                                            <span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full flex items-center gap-1.5">
+                                                <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span> Diterima
+                                            </span>
+                                        @elseif(($item->status ?? 'pending') === 'rejected')
+                                            <span class="text-[10px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/20 px-3 py-1 rounded-full flex items-center gap-1.5">
+                                                <span class="w-1.5 h-1.5 bg-rose-400 rounded-full"></span> Ditolak
+                                            </span>
+                                        @else
+                                            <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-full flex items-center gap-1.5">
+                                                <span class="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse"></span> Menunggu
+                                            </span>
+                                        @endif
+                                    </div>
+                                    
+                                    <div class="text-sm font-bold text-slate-300 text-right min-w-[100px]">
+                                        Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}
+                                    </div>
                                 </div>
                             </div>
                         @endforeach
@@ -105,7 +106,7 @@
                             <p class="text-[10px] text-slate-500 mt-1">Metode: <span class="uppercase font-mono text-slate-400 font-bold">{{ $order->payment_method }}</span></p>
                         </div>
                         <div class="sm:text-right flex flex-row sm:flex-col justify-between sm:justify-end items-center sm:items-end gap-1 border-t sm:border-t-0 border-white/5 pt-3 sm:pt-0">
-                            <span class="text-slate-500 font-medium">Total Belanja:</span>
+                            <span class="text-slate-500 font-medium">Total Pembayaran:</span>
                             <span class="text-lg font-black text-cyan-400">Rp {{ number_format($order->total_price, 0, ',', '.') }}</span>
                         </div>
                     </div>

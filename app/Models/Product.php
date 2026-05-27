@@ -4,8 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-// PERBAIKAN: Impor namespace resmi untuk relasi BelongsTo
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+// TAMBAHAN: Impor namespace untuk relasi HasMany ke OrderItem
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -26,8 +27,19 @@ class Product extends Model
         'specifications' => 'array',
     ];
 
+    /**
+     * Relasi ke User (Penjual/Admin yang memiliki produk ini)
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * TAMBAHAN RELASI: Produk ini bisa dibeli dalam banyak item pesanan
+     */
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class, 'product_id');
     }
 }

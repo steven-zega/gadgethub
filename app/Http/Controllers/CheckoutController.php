@@ -20,10 +20,10 @@ class CheckoutController extends Controller
         $checkoutItems = [];
         $totalPrice = 0;
         $productId = null;
+        $quantity = $request->query('quantity', 1); // Tangkap kuantitas dari awal
 
         if ($type === 'instant') {
             $productId = $request->query('product_id');
-            $quantity = $request->query('quantity', 1);
             $product = Product::findOrFail($productId);
             
             $subtotal = $product->price * $quantity;
@@ -49,8 +49,7 @@ class CheckoutController extends Controller
             }
         }
 
-        // DIUBAH: Mengarah ke 'user.checkout' karena filemu ada di folder resources/views/user/
-        return view('user.checkout', compact('checkoutItems', 'totalPrice', 'type', 'productId'));
+        return view('user.checkout', compact('checkoutItems', 'totalPrice', 'type', 'productId', 'quantity'));
     }
 
     /**
@@ -58,12 +57,18 @@ class CheckoutController extends Controller
      */
     public function payment(Request $request)
     {
-        // UBAH dari query() menjadi input() karena dikirim via POST
+        // Jika user me-refresh halaman (GET) atau mengakses langsung tanpa isi alamat, kembalikan ke checkout
+        if ($request->isMethod('get') || !$request->has('address')) {
+            return redirect()->route('checkout.index')->with('error', 'Silakan isi alamat pengiriman terlebih dahulu.');
+        }
+
+        // Menangkap seluruh input dari form checkout via POST
         $address = $request->input('address');
         $type = $request->input('type');
         $productId = $request->input('product_id');
+        $quantity = $request->input('quantity', 1); 
 
-        return view('user.payment', compact('address', 'type', 'productId'));
+        return view('user.payment', compact('address', 'type', 'productId', 'quantity'));
     }
 
     public function uploadPayment(Request $request)
@@ -84,12 +89,21 @@ class CheckoutController extends Controller
 
             if ($request->type === 'instant') {
                 $product = Product::findOrFail($request->product_id);
-                $quantity = $request->query('quantity', 1); // atau tangkap dari input jika ada
+                $quantity = $request->input('quantity', 1); 
+                
+                // Validasi tambahan: Cek stok barang sebelum deal dibeli
+                if ($product->stock < $quantity) {
+                    return redirect()->back()->with('error', 'Stok produk ' . $product->name . ' tidak mencukupi.');
+                }
+
                 $totalPrice = $product->price * $quantity;
                 $itemsToSave[] = ['product_id' => $product->id, 'quantity' => $quantity, 'price' => $product->price];
             } else {
                 $cartItems = Cart::where('user_id', auth()->id())->with('product')->get();
                 foreach ($cartItems as $item) {
+                    if ($item->product->stock < $item->quantity) {
+                        return redirect()->back()->with('error', 'Stok produk ' . $item->product->name . ' tidak mencukupi.');
+                    }
                     $totalPrice += $item->product->price * $item->quantity;
                     $itemsToSave[] = ['product_id' => $item->product_id, 'quantity' => $item->quantity, 'price' => $item->product->price];
                 }
@@ -99,6 +113,7 @@ class CheckoutController extends Controller
             $order = Order::create([
                 'user_id' => auth()->id(),
                 'invoice_number' => 'INV-' . strtoupper(Str::random(8)) . '-' . time(),
+                'buyer_name' => auth()->user()->name, 
                 'address' => $request->address,
                 'payment_method' => $request->payment_method,
                 'payment_proof' => $path,
@@ -106,14 +121,19 @@ class CheckoutController extends Controller
                 'status' => 'pending'
             ]);
 
-            // 3. Simpan item detailnya
+            // 3. Simpan item detailnya & Potong stok otomatis
             foreach ($itemsToSave as $item) {
+                // 🌟 PERBAIKAN: Menyertakan 'status' => 'pending' pada level OrderItem saat data dimasukkan pertama kali
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $item['product_id'],
                     'quantity' => $item['quantity'],
-                    'price' => $item['price']
+                    'price' => $item['price'],
+                    'status' => 'pending' 
                 ]);
+
+                // Potong stok produk dari database penjual/admin
+                Product::where('id', $item['product_id'])->decrement('stock', $item['quantity']);
             }
 
             // 4. Jika checkout dari keranjang, hapus keranjang user karena sudah dibeli
@@ -121,7 +141,6 @@ class CheckoutController extends Controller
                 Cart::where('user_id', auth()->id())->delete();
             }
 
-            // Redirect langsung ke rute riwayat pesanan dengan pesan sukses
             return redirect()->route('user.orders')->with('success', 'Pesanan berhasil dibuat! Menunggu verifikasi admin.');
         }
 

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\OrderController as AdminOrderController; // IMPOR BARU: Untuk pesanan admin
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CartController; 
 use App\Http\Controllers\CheckoutController; // Tambahan import untuk modul checkout
@@ -58,14 +59,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
 
-    // TAMBAHAN BARU: Fitur Halaman Pembayaran & Upload Bukti Pembayaran
-    Route::post('/checkout/payment', [CheckoutController::class, 'payment'])->name('checkout.payment');
+    // PERBAIKAN: Menggunakan match agar aman saat di-refresh (Mendukung GET dan POST)
+    Route::match(['get', 'post'], '/checkout/payment', [CheckoutController::class, 'payment'])->name('checkout.payment');
     Route::post('/checkout/payment/upload', [CheckoutController::class, 'uploadPayment'])->name('checkout.payment.upload');
 
     Route::get('/user/orders', [CheckoutController::class, 'orders'])->name('user.orders');
-    });
+});
 
-// Group Route CRUD Admin (Sudah diberi pengaman middleware auth dan admin)
-Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::resource('products', ProductController::class);
+    
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+    
+    Route::patch('/orders/{id}/update-status', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
 });

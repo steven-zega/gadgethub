@@ -78,7 +78,7 @@
                         @endif
                     </div>
 
-                    <textarea name="address" x-model="address" rows="4" placeholder="Ketik alamat pengiriman disini..." class="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-cyan-400 transition leading-relaxed" required></textarea>
+                    <textarea name="address_view" x-model="address" rows="4" placeholder="Ketik alamat pengiriman disini..." class="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-4 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-cyan-400 transition leading-relaxed"></textarea>
                     
                     @if(empty(auth()->user()->address))
                         <p class="text-[11px] text-slate-500 mt-2">
@@ -155,16 +155,18 @@
                         </div>
                     </div>
 
-                    <form action="{{ route('checkout.payment') }}" method="POST" @submit="if(address === '') { alert('Alamat pengiriman wajib diisi!'); $event.preventDefault(); }">
-                        @csrf <input type="hidden" name="type" value="{{ $type }}">
+                    <form action="{{ route('checkout.payment') }}" method="POST" @submit="if(address.trim() === '') { alert('Alamat pengiriman wajib diisi!'); $event.preventDefault(); }">
+                        @csrf 
+                        <input type="hidden" name="type" value="{{ $type }}">
                         <input type="hidden" name="address" :value="address">
+                        <input type="hidden" name="quantity" value="{{ $quantity ?? 1 }}">
                         
                         @if(isset($productId))
                             <input type="hidden" name="product_id" value="{{ $productId }}">
                         @endif
 
                         <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black py-4 rounded-xl shadow-lg shadow-emerald-500/25 transition transform hover:-translate-y-0.5 text-center text-sm flex items-center justify-center gap-2 group">
-                            Bayar Sekarang
+                            Lanjut ke Pembayaran
                         </button>
                     </form>
                 </div>

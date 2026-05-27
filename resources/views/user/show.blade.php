@@ -67,7 +67,7 @@
                     <div class="bg-white/5 rounded-2xl p-4 mb-8 space-y-3 border border-white/5 text-sm">
                         <div class="flex justify-between items-center pb-2 border-b border-white/5">
                             <span class="text-slate-400 flex items-center gap-1.5"><i class="bi bi-shield-check text-blue-400"></i> Seller:</span>
-                            <span class="font-bold text-white">{{ $seller->name ?? 'Admin GadgetHub' }}</span>
+                            <span class="font-bold text-white">{{ $product->user->name ?? 'Admin GadgetHub' }}</span>
                         </div>
                         <div class="flex justify-between items-center">
                             <span class="text-slate-400 flex items-center gap-1.5"><i class="bi bi-boxes text-blue-400"></i> Stock:</span>

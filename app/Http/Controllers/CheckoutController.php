@@ -2,78 +2,140 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
-use App\Models\Cart;
 use Illuminate\Http\Request;
+use App\Models\Cart;
+use App\Models\Product;
+use App\Models\Order;
+use App\Models\OrderItem;
+use Illuminate\Support\Str;
 
 class CheckoutController extends Controller
 {
     /**
-     * Menampilkan Halaman Checkout (Mendukung Keranjang & Instant)
+     * Halaman Checkout Utama
      */
     public function index(Request $request)
     {
-        $user = auth()->user();
-        $checkoutItems = collect();
-        $type = $request->query('type', 'cart'); // 'cart' atau 'instant'
-        $productId = null; // Inisialisasi ID produk untuk tombol kembali
+        $type = $request->query('type', 'cart');
+        $checkoutItems = [];
+        $totalPrice = 0;
+        $productId = null;
 
         if ($type === 'instant') {
-            // Validasi data untuk instant checkout
-            $request->validate([
-                'product_id' => 'required|exists:products,id',
-                'quantity' => 'required|integer|min:1'
-            ]);
+            $productId = $request->query('product_id');
+            $quantity = $request->query('quantity', 1);
+            $product = Product::findOrFail($productId);
+            
+            $subtotal = $product->price * $quantity;
+            $totalPrice = $subtotal;
 
-            $product = Product::findOrFail($request->product_id);
-            $quantity = $request->quantity;
-            $productId = $product->id; // Simpan ID produk untuk dilempar ke view
-
-            // Masukkan ke koleksi object palsu mirip struktur Cart agar blade tinggal pakai
-            $checkoutItems->push((object)[
+            $checkoutItems[] = (object)[
                 'product' => $product,
                 'quantity' => $quantity,
-                'subtotal' => $product->price * $quantity
-            ]);
+                'subtotal' => $subtotal
+            ];
         } else {
-            // Ambil dari keranjang belanja database
-            $cartData = Cart::where('user_id', $user->id)->with('product')->get();
+            $cartItems = Cart::where('user_id', auth()->id())->with('product')->get();
             
-            if ($cartData->isEmpty()) {
-                return redirect()->route('cart.index')->with('error', 'Keranjang Anda kosong, tidak bisa checkout.');
-            }
-
-            foreach ($cartData as $item) {
-                $checkoutItems->push((object)[
+            foreach ($cartItems as $item) {
+                $subtotal = $item->product->price * $item->quantity;
+                $totalPrice += $subtotal;
+                
+                $checkoutItems[] = (object)[
                     'product' => $item->product,
                     'quantity' => $item->quantity,
-                    'subtotal' => $item->product->price * $item->quantity
-                ]);
+                    'subtotal' => $subtotal
+                ];
             }
         }
 
-        $totalPrice = $checkoutItems->sum('subtotal');
-
-        // Mengirimkan variabel $type dan $productId ke file blade
+        // DIUBAH: Mengarah ke 'user.checkout' karena filemu ada di folder resources/views/user/
         return view('user.checkout', compact('checkoutItems', 'totalPrice', 'type', 'productId'));
     }
 
     /**
-     * Proses Pembayaran / Submit Order
+     * Halaman Metode & Upload Pembayaran
      */
-    public function process(Request $request)
+    public function payment(Request $request)
+    {
+        // UBAH dari query() menjadi input() karena dikirim via POST
+        $address = $request->input('address');
+        $type = $request->input('type');
+        $productId = $request->input('product_id');
+
+        return view('user.payment', compact('address', 'type', 'productId'));
+    }
+
+    public function uploadPayment(Request $request)
     {
         $request->validate([
-            'address' => 'required|string',
-            'type' => 'required|in:cart,instant',
+            'payment_method' => 'required',
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'address' => 'required',
+            'type' => 'required'
         ]);
 
-        // SEMENTARA: Kurangi stok produk & Kosongkan keranjang jika tipe 'cart'
-        // Nanti di sini tempat integrasi Midtrans / Gateway Pembayaran
-        if ($request->type === 'cart') {
-            Cart::where('user_id', auth()->id())->delete();
+        if ($request->hasFile('payment_proof')) {
+            $path = $request->file('payment_proof')->store('payment_proofs', 'public');
+
+            // 1. Hitung total harga ulang di backend (keamanan data)
+            $totalPrice = 0;
+            $itemsToSave = [];
+
+            if ($request->type === 'instant') {
+                $product = Product::findOrFail($request->product_id);
+                $quantity = $request->query('quantity', 1); // atau tangkap dari input jika ada
+                $totalPrice = $product->price * $quantity;
+                $itemsToSave[] = ['product_id' => $product->id, 'quantity' => $quantity, 'price' => $product->price];
+            } else {
+                $cartItems = Cart::where('user_id', auth()->id())->with('product')->get();
+                foreach ($cartItems as $item) {
+                    $totalPrice += $item->product->price * $item->quantity;
+                    $itemsToSave[] = ['product_id' => $item->product_id, 'quantity' => $item->quantity, 'price' => $item->product->price];
+                }
+            }
+
+            // 2. Buat data Order induk
+            $order = Order::create([
+                'user_id' => auth()->id(),
+                'invoice_number' => 'INV-' . strtoupper(Str::random(8)) . '-' . time(),
+                'address' => $request->address,
+                'payment_method' => $request->payment_method,
+                'payment_proof' => $path,
+                'total_price' => $totalPrice,
+                'status' => 'pending'
+            ]);
+
+            // 3. Simpan item detailnya
+            foreach ($itemsToSave as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price']
+                ]);
+            }
+
+            // 4. Jika checkout dari keranjang, hapus keranjang user karena sudah dibeli
+            if ($request->type === 'cart') {
+                Cart::where('user_id', auth()->id())->delete();
+            }
+
+            // Redirect langsung ke rute riwayat pesanan dengan pesan sukses
+            return redirect()->route('user.orders')->with('success', 'Pesanan berhasil dibuat! Menunggu verifikasi admin.');
         }
 
-        return redirect()->route('user.dashboard')->with('success', 'Pesanan berhasil dibuat! Terima kasih telah berbelanja di GadgetHub.');
+        return redirect()->back()->with('error', 'Gagal memproses pembayaran.');
+    }
+
+    /**
+     * Menampilkan Halaman Riwayat Pemesanan User
+     */
+    public function orders()
+    {
+        // Mengambil riwayat order milik user yang sedang login, diurutkan dari yang terbaru
+        $orders = Order::where('user_id', auth()->id())->with('items.product')->latest()->get();
+        
+        return view('user.orders', compact('orders'));
     }
 }

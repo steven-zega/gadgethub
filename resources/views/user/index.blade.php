@@ -18,7 +18,12 @@
                         GADGET<span class="text-white">HUB</span>
                     </a>
                 </div>
-                <div class="flex items-center space-x-6">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ route('user.orders') }}" class="relative p-2 text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 rounded-xl transition flex items-center justify-center group gap-1.5" title="Pesanan Saya">
+                        <i class="bi bi-receipt text-xl transition-transform group-hover:scale-110"></i>
+                        <span class="text-xs font-bold hidden md:inline">Pesanan Saya</span>
+                    </a>
+
                     <a href="{{ route('cart.index') }}" class="relative p-2 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-xl transition flex items-center justify-center group" title="Keranjang Belanja">
                         <i class="bi bi-cart3 text-xl transition-transform group-hover:scale-110"></i>
                         <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]"></span>

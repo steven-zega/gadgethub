@@ -41,10 +41,12 @@ Route::get('/admin/dashboard', function () {
 Route::get('/user/dashboard', [HomeController::class, 'index'])->middleware('auth')->name('user.dashboard');
 Route::get('/user/products/{id}', [HomeController::class, 'show'])->middleware('auth')->name('user.products.show');
 
-// MODIFIKASI: Menambahkan Group Route untuk Cart, Profile, & Checkout User
+// MODIFIKASI: Menambahkan Group Route untuk Cart, Profile, Checkout, & Payment User
 Route::middleware(['auth'])->group(function () {
     // Fitur Keranjang Belanja
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    // Menambahkan name pada rute delete agar jika ada fitur hapus item keranjang bisa berjalan lancar
+    Route::delete('/cart/remove/{id}', [CartController::class, 'destroy'])->name('cart.remove'); 
     Route::post('/cart/add/{product}', [CartController::class, 'store'])->name('cart.add');
     Route::post('/cart/update/{id}', [CartController::class, 'updateQuantity'])->name('cart.update');
 
@@ -55,7 +57,13 @@ Route::middleware(['auth'])->group(function () {
     // Fitur Secure Checkout (Keranjang & Instant)
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
-});
+
+    // TAMBAHAN BARU: Fitur Halaman Pembayaran & Upload Bukti Pembayaran
+    Route::post('/checkout/payment', [CheckoutController::class, 'payment'])->name('checkout.payment');
+    Route::post('/checkout/payment/upload', [CheckoutController::class, 'uploadPayment'])->name('checkout.payment.upload');
+
+    Route::get('/user/orders', [CheckoutController::class, 'orders'])->name('user.orders');
+    });
 
 // Group Route CRUD Admin (Sudah diberi pengaman middleware auth dan admin)
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {

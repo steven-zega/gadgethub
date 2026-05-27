@@ -51,12 +51,12 @@
                 <a href="{{ route('cart.index') }}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-blue-400 transition group">
                     <i class="bi bi-arrow-left transition-transform group-hover:-translate-x-1"></i> Kembali
                 </a>
-            @elseif(isset($type) && $type === 'instant')
-                <a href="{{ url()->previous() }}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-blue-400 transition group">
+            @elseif(isset($type) && $type === 'instant' && isset($productId))
+                <a href="{{ route('user.products.show', $productId) }}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-blue-400 transition group">
                     <i class="bi bi-arrow-left transition-transform group-hover:-translate-x-1"></i> Kembali
                 </a>
             @else
-                <a href="{{ url('/') }}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-blue-400 transition group">
+                <a href="{{ route('user.dashboard') }}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-blue-400 transition group">
                     <i class="bi bi-arrow-left transition-transform group-hover:-translate-x-1"></i> Kembali
                 </a>
             @endif
@@ -155,13 +155,16 @@
                         </div>
                     </div>
 
-                    <form action="{{ route('checkout.process') }}" method="POST" @submit="if(address === '') { alert('Alamat pengiriman wajib diisi!'); $event.preventDefault(); }">
-                        @csrf
-                        <input type="hidden" name="type" value="{{ $type }}">
+                    <form action="{{ route('checkout.payment') }}" method="POST" @submit="if(address === '') { alert('Alamat pengiriman wajib diisi!'); $event.preventDefault(); }">
+                        @csrf <input type="hidden" name="type" value="{{ $type }}">
                         <input type="hidden" name="address" :value="address">
+                        
+                        @if(isset($productId))
+                            <input type="hidden" name="product_id" value="{{ $productId }}">
+                        @endif
 
                         <button type="submit" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black py-4 rounded-xl shadow-lg shadow-emerald-500/25 transition transform hover:-translate-y-0.5 text-center text-sm flex items-center justify-center gap-2 group">
-                        Bayar Sekarang
+                            Bayar Sekarang
                         </button>
                     </form>
                 </div>

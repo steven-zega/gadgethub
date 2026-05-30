@@ -11,17 +11,13 @@ class ProductController extends Controller
 {
     public function index()
     {
-        // Hanya mengambil produk milik admin yang sedang login
         $products = Product::where('user_id', auth()->id())->latest()->get();
         return view('admin.products.index', compact('products'));
     }
 
-    public function show($id)
+        public function show($id)
     {
-        // Memastikan produk yang dilihat adalah milik admin yang sedang login
-        $product = Product::where('user_id', auth()->id())->findOrFail($id);
-
-        return view('admin.products.show', compact('product'));
+        return redirect()->route('products.edit', $id);
     }
 
     public function create()
@@ -38,14 +34,13 @@ class ProductController extends Controller
             'stock' => 'required|integer',
             'description' => 'nullable',
             'image' => 'nullable|image',
-            'specifications' => 'nullable|array', // <-- PERUBAHAN: Izinkan data spesifikasi berbentuk array masuk
+            'specifications' => 'nullable|array',
         ]);
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('products', 'public');
         }
 
-        // Otomatis mengikat user_id dengan id admin yang sedang login
         $data['user_id'] = auth()->id();
 
         Product::create($data);
@@ -55,7 +50,6 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        // Pengaman: Jika admin mencoba mengedit produk milik orang lain, lempar error 403
         if ($product->user_id !== auth()->id()) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah produk ini.');
         }
@@ -65,7 +59,6 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-        // Pengaman: Pastikan produk yang diupdate adalah miliknya sendiri
         if ($product->user_id !== auth()->id()) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah produk ini.');
         }
@@ -77,7 +70,7 @@ class ProductController extends Controller
             'stock' => 'required|integer',
             'description' => 'nullable',
             'image' => 'nullable|image',
-            'specifications' => 'nullable|array', // <-- PERUBAHAN: Izinkan data spesifikasi berbentuk array masuk saat update produk
+            'specifications' => 'nullable|array',
         ]);
 
         if ($request->hasFile('image')) {
@@ -94,7 +87,6 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        // Pengaman: Pastikan produk yang dihapus adalah miliknya sendiri
         if ($product->user_id !== auth()->id()) {
             abort(403, 'Anda tidak memiliki hak akses untuk menghapus produk ini.');
         }

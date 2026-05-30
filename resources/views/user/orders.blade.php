@@ -112,6 +112,24 @@
                         </div>
                     </div>
 
+                    @if($order->items->where('status', 'rejected')->count() > 0)
+                        <div class="p-4 sm:px-6 bg-slate-950/60 border-t border-white/5 flex justify-end items-center gap-3">
+                            <form action="{{ route('user.orders.hide', $order->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus riwayat pesanan ini secara permanen dari database?')">
+                                @csrf
+                                <button type="submit" class="text-xs font-bold bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 px-4 py-2.5 rounded-xl transition flex items-center gap-1.5">
+                                    <i class="bi bi-trash3"></i> Hapus Riwayat
+                                </button>
+                            </form>
+
+                            <form action="{{ route('user.orders.reorder', $order->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl transition flex items-center gap-1.5 shadow-lg shadow-blue-600/10">
+                                    <i class="bi bi-arrow-clockwise"></i> Pesan Ulang
+                                </button>
+                            </form>
+                        </div>
+                    @endif
+
                 </div>
             @empty
                 <div class="text-center py-20 bg-slate-900/40 border border-white/10 rounded-3xl backdrop-blur-md">

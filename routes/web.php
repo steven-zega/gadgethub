@@ -64,9 +64,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/checkout/payment/upload', [CheckoutController::class, 'uploadPayment'])->name('checkout.payment.upload');
 
     Route::get('/user/orders', [CheckoutController::class, 'orders'])->name('user.orders');
+    
+    // 🌟 TAMBAHAN BARU: Fitur Hapus Riwayat & Pesan Ulang (Gunakan POST demi keamanan data)
+    Route::post('/user/orders/{id}/hide', [CheckoutController::class, 'hideOrder'])->name('user.orders.hide');
+    Route::post('/user/orders/{id}/reorder', [CheckoutController::class, 'reorder'])->name('user.orders.reorder');
 });
 
-    Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::resource('products', ProductController::class);
     
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');

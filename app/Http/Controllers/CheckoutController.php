@@ -163,14 +163,61 @@ class CheckoutController extends Controller
         return redirect()->back()->with('error', 'Gagal memproses pembayaran.');
     }
     
-    /**
-     * Menampilkan Halaman Riwayat Pemesanan User
-     */
     public function orders()
     {
-        // Mengambil riwayat order milik user yang sedang login, diurutkan dari yang terbaru
-        $orders = Order::where('user_id', auth()->id())->with('items.product')->latest()->get();
+        // 🌟 PERBAIKAN: Hanya mengambil order yang is_visible bernilai true (1)
+        $orders = Order::where('user_id', auth()->id())
+                        ->where('is_visible', true)
+                        ->with('items.product')
+                        ->latest()
+                        ->get();
         
         return view('user.orders', compact('orders'));
+    }
+
+    public function hideOrder($id)
+    {
+        // Cari order milik user tersebut
+        $order = Order::where('id', $id)->where('user_id', auth()->id())->firstOrFail();
+        
+        // 🌟 PERBAIKAN: Cukup ubah is_visible menjadi false. Data di database TETAP AMAN!
+        $order->update([
+            'is_visible' => false
+        ]);
+
+        return redirect()->back()->with('success', 'Riwayat pesanan telah berhasil dihapus.');
+    }
+
+    public function reorder($id)
+    {
+        $order = Order::where('id', $id)->where('user_id', auth()->id())->with('items.product')->firstOrFail();
+
+        foreach ($order->items as $item) {
+            // Validasi: Pastikan produk masih ada dan stoknya di atas 0
+            if ($item->product && $item->product->stock > 0) {
+                
+                // Cari tahu apakah produk ini sudah ada di dalam keranjang belanja user
+                $existingCart = Cart::where('user_id', auth()->id())
+                                    ->where('product_id', $item->product_id)
+                                    ->first();
+
+                if ($existingCart) {
+                    // Jika ada, jumlahkan kuantitas barunya, namun batasi agar tidak melampaui sisa stok riil produk
+                    $newQty = $existingCart->quantity + $item->quantity;
+                    $existingCart->update([
+                        'quantity' => min($newQty, $item->product->stock)
+                    ]);
+                } else {
+                    // Jika belum ada, buat record baru di dalam keranjang belanja
+                    Cart::create([
+                        'user_id' => auth()->id(),
+                        'product_id' => $item->product_id,
+                        'quantity' => min($item->quantity, $item->product->stock)
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->route('cart.index')->with('success', 'Produk berhasil dimasukkan kembali ke keranjang belanja. Silakan periksa sisa kuantitas stok Anda.');
     }
 }

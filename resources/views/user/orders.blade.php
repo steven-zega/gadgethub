@@ -27,6 +27,7 @@
         <div class="flex justify-between items-center mb-8 relative z-10">
             <div>
                 <h1 class="text-2xl font-black tracking-tight">Riwayat Pemesanan</h1>
+                <p class="text-xs text-slate-400 mt-1">Invoice otomatis terpisah berdasarkan toko/penjual produk</p>
             </div>
             <a href="{{ route('user.dashboard') }}" class="text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl transition">
                 <i class="bi bi-house-door"></i> Kembali
@@ -106,7 +107,7 @@
                             <p class="text-[10px] text-slate-500 mt-1">Metode: <span class="uppercase font-mono text-slate-400 font-bold">{{ $order->payment_method }}</span></p>
                         </div>
                         <div class="sm:text-right flex flex-row sm:flex-col justify-between sm:justify-end items-center sm:items-end gap-1 border-t sm:border-t-0 border-white/5 pt-3 sm:pt-0">
-                            <span class="text-slate-500 font-medium">Total Pembayaran:</span>
+                            <span class="text-slate-500 font-medium">Total Tagihan Toko:</span>
                             <span class="text-lg font-black text-cyan-400">Rp {{ number_format($order->total_price, 0, ',', '.') }}</span>
                         </div>
                     </div>

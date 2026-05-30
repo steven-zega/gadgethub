@@ -12,9 +12,9 @@ class Order extends Model
 {
     use HasFactory;
 
-    // PERBAIKAN: Tambahkan 'buyer_name' agar diizinkan masuk dalam Mass Assignment (create/update)
     protected $fillable = [
         'user_id', 
+        'admin_id',
         'invoice_number', 
         'buyer_name', 
         'address', 
@@ -24,9 +24,6 @@ class Order extends Model
         'status'
     ];
 
-    /**
-     * Relasi ke User (Konsumen/Pembeli yang membuat pesanan ini)
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');

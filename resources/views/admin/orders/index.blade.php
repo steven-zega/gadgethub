@@ -178,7 +178,7 @@
                             <tr>
                                 <td colspan="7" class="text-center py-5 text-muted fst-italic">
                                     <i class="bi bi-inbox text-secondary display-5 d-block mb-2"></i>
-                                    Belum ada pesanan masuk untuk produk jualan Anda saat ini.
+                                    Belum ada pesanan masuk.
                                 </td>
                             </tr>
                         @endforelse

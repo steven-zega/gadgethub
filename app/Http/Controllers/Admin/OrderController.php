@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\OrderItem; // Fokus utama pada item pesanan
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -20,25 +20,18 @@ class OrderController extends Controller
         return view('admin.orders.index', compact('orders'));
     }
 
-    /**
-     * Memproses verifikasi setuju atau tolak pembayaran per ITEM produk
-     */
     public function updateStatus(Request $request, $id)
     {
-        // 1. Validasi input status, hanya boleh 'success' atau 'rejected'
         $request->validate([
             'status' => 'required|in:success,rejected'
         ]);
 
-        // 2. PERBAIKAN: Cari data berdasarkan ID OrderItem (bukan Order induk)
         $orderItem = OrderItem::findOrFail($id);
 
-        // 3. Update status spesifik untuk produk ini saja
         $orderItem->update([
             'status' => $request->status
         ]);
 
-        // 4. Set teks notifikasi kilat berdasarkan pilihan aksi admin
         $message = $request->status === 'success' 
             ? 'Pembayaran produk berhasil diverifikasi!' 
             : 'Pembayaran produk telah ditolak.';

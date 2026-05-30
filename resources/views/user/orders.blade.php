@@ -27,7 +27,6 @@
         <div class="flex justify-between items-center mb-8 relative z-10">
             <div>
                 <h1 class="text-2xl font-black tracking-tight">Riwayat Pemesanan</h1>
-                <p class="text-xs text-slate-400 mt-1">Invoice otomatis terpisah berdasarkan toko/penjual produk</p>
             </div>
             <a href="{{ route('user.dashboard') }}" class="text-xs font-bold bg-white/5 hover:bg-white/10 border border-white/10 px-4 py-2 rounded-xl transition">
                 <i class="bi bi-house-door"></i> Kembali

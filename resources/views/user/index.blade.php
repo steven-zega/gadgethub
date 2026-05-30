@@ -157,8 +157,7 @@
         @if($products->isEmpty())
             <div class="text-center py-20 bg-white/5 rounded-3xl border border-white/10 backdrop-blur-sm">
                 <i class="bi bi-patch-exclamation text-slate-500 text-5xl block mb-4"></i>
-                <p class="text-slate-300 text-xl font-medium">Belum ada gadget di kategori ini saat ini.</p>
-                <p class="text-slate-500 text-sm mt-2">Silakan ganti filter atau tambahkan produk baru melalui manajemen admin.</p>
+                <p class="text-slate-300 text-xl font-medium">Belum ada produk di kategori ini saat ini.</p>
             </div>
         @else
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">

@@ -11,16 +11,13 @@ use Illuminate\Support\Str;
 
 class CheckoutController extends Controller
 {
-    /**
-     * Halaman Checkout Utama
-     */
     public function index(Request $request)
     {
         $type = $request->query('type', 'cart');
         $checkoutItems = [];
         $totalPrice = 0;
         $productId = null;
-        $quantity = $request->query('quantity', 1); // Tangkap kuantitas dari awal
+        $quantity = $request->query('quantity', 1); 
 
         if ($type === 'instant') {
             $productId = $request->query('product_id');
@@ -52,12 +49,8 @@ class CheckoutController extends Controller
         return view('user.checkout', compact('checkoutItems', 'totalPrice', 'type', 'productId', 'quantity'));
     }
 
-    /**
-     * Halaman Metode & Upload Pembayaran
-     */
     public function payment(Request $request)
     {
-        // Jika user me-refresh halaman (GET) atau mengakses langsung tanpa isi alamat, kembalikan ke checkout
         if ($request->isMethod('get') || !$request->has('address')) {
             return redirect()->route('checkout.index')->with('error', 'Silakan isi alamat pengiriman terlebih dahulu.');
         }
@@ -94,20 +87,19 @@ class CheckoutController extends Controller
                 }
 
                 $itemsToGroup[] = [
-                    'admin_id' => $product->user_id ?? 1, // 🌟 PERBAIKAN: Menggunakan 'user_id' sesuai tabel products kamu
+                    'admin_id' => $product->user_id ?? 1,
                     'product_id' => $product->id, 
                     'quantity' => $quantity, 
                     'price' => $product->price
                 ];
             } else {
-                // Ambil data keranjang dengan relasi produk
                 $cartItems = Cart::where('user_id', auth()->id())->with('product')->get();
                 foreach ($cartItems as $item) {
                     if ($item->product->stock < $item->quantity) {
                         return redirect()->back()->with('error', 'Stok produk ' . $item->product->name . ' tidak mencukupi.');
                     }
                     $itemsToGroup[] = [
-                        'admin_id' => $item->product->user_id ?? 1, // 🌟 PERBAIKAN: Menggunakan 'user_id' sesuai tabel products kamu
+                        'admin_id' => $item->product->user_id ?? 1,
                         'product_id' => $item->product_id, 
                         'quantity' => $item->quantity, 
                         'price' => $item->product->price
@@ -115,7 +107,6 @@ class CheckoutController extends Controller
                 }
             }
 
-            // 2. Kelompokkan item berdasarkan user_id (Admin Pemilik Produk)
             $groupedItems = collect($itemsToGroup)->groupBy('admin_id');
 
             // 3. Looping untuk membuat satu invoice per admin
@@ -124,10 +115,9 @@ class CheckoutController extends Controller
                     return $item['price'] * $item['quantity'];
                 });
 
-                // Buat invoice unik per admin
                 $order = Order::create([
                     'user_id' => auth()->id(),
-                    'admin_id' => $adminId, // Menyimpan ID Admin pemilik ke orders
+                    'admin_id' => $adminId,
                     'invoice_number' => 'INV-' . strtoupper(Str::random(5)) . '-' . $adminId . '-' . time(),
                     'buyer_name' => auth()->user()->name, 
                     'address' => $request->address,
@@ -137,7 +127,6 @@ class CheckoutController extends Controller
                     'status' => 'pending'
                 ]);
 
-                // Simpan detail item ke invoice terkait
                 foreach ($items as $item) {
                     OrderItem::create([
                         'order_id' => $order->id,
@@ -165,7 +154,6 @@ class CheckoutController extends Controller
     
     public function orders()
     {
-        // 🌟 PERBAIKAN: Hanya mengambil order yang is_visible bernilai true (1)
         $orders = Order::where('user_id', auth()->id())
                         ->where('is_visible', true)
                         ->with('items.product')
@@ -177,10 +165,8 @@ class CheckoutController extends Controller
 
     public function hideOrder($id)
     {
-        // Cari order milik user tersebut
         $order = Order::where('id', $id)->where('user_id', auth()->id())->firstOrFail();
         
-        // 🌟 PERBAIKAN: Cukup ubah is_visible menjadi false. Data di database TETAP AMAN!
         $order->update([
             'is_visible' => false
         ]);
@@ -196,19 +182,15 @@ class CheckoutController extends Controller
             // Validasi: Pastikan produk masih ada dan stoknya di atas 0
             if ($item->product && $item->product->stock > 0) {
                 
-                // Cari tahu apakah produk ini sudah ada di dalam keranjang belanja user
                 $existingCart = Cart::where('user_id', auth()->id())
                                     ->where('product_id', $item->product_id)
                                     ->first();
-
                 if ($existingCart) {
-                    // Jika ada, jumlahkan kuantitas barunya, namun batasi agar tidak melampaui sisa stok riil produk
                     $newQty = $existingCart->quantity + $item->quantity;
                     $existingCart->update([
                         'quantity' => min($newQty, $item->product->stock)
                     ]);
                 } else {
-                    // Jika belum ada, buat record baru di dalam keranjang belanja
                     Cart::create([
                         'user_id' => auth()->id(),
                         'product_id' => $item->product_id,

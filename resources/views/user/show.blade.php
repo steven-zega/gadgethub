@@ -95,13 +95,13 @@
                             <i class="bi bi-file-text"></i> Deskripsi Produk
                         </h2>
                         <p class="text-slate-300 text-sm leading-relaxed whitespace-pre-line bg-white/[0.02] p-4 rounded-xl border border-white/5">
-                            {{ $product->description ?? 'Tidak ada deskripsi lengkap untuk produk ini.' }}
+                            {{ $product->description ?? 'Tidak ada deskripsi untuk produk ini.' }}
                         </p>
                     </div>
 
                     <div class="mb-8">
                         <h2 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-3 flex items-center gap-1.5">
-                            <i class="bi bi-cpu-fill text-cyan-400"></i> Spesifikasi Teknis {{ $product->category ?? '' }}
+                            <i class="bi bi-cpu-fill text-cyan-400"></i> Spesifikasi {{ $product->category ?? '' }}
                         </h2>
                         
                         @if(!empty($product->specifications))
